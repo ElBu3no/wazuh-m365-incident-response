@@ -1,160 +1,88 @@
 Wazuh M365 Incident Response
 
-Automated incident response for Microsoft 365 using Wazuh SIEM, threat intelligence enrichment, and email alerting.
+Incident response automation for Microsoft 365 login events using Wazuh, threat intelligence enrichment and email alerting.
 
-📌 About the Project
+About this project
 
-This repository showcases an automated incident response solution inspired by a real-world phishing case in a Microsoft 365 environment.
-The goal is to demonstrate how a Blue Team can detect, analyze, and respond to suspicious activities using Wazuh as a SIEM, custom Python scripting, and external Threat Intelligence sources.
+This project was built after a real phishing incident involving Microsoft 365 accounts.
 
-All sensitive information has been sanitized and adapted for educational purposes.
+The goal was not to create a full SOAR platform, but to show how a Blue Team can be effective with simple, well-designed automation.
+By combining Wazuh logs, contextual checks and external threat intelligence, the script helps identify when a login event actually deserves attention.
 
-🎯 Objectives
+All sensitive information has been anonymized and adapted for educational use.
 
-Centralize and analyze Microsoft 365 logs
+What this script actually does
 
-Detect suspicious login activity (e.g., logins from foreign IPs)
+Queries Microsoft 365 login events stored in Wazuh / OpenSearch
 
-Enrich events with Threat Intelligence data
+Focuses on logins coming from outside the expected country
 
-Reduce false positives using contextual checks
+Enriches IPs with:
 
-Automate alerting for faster incident response
+AbuseIPDB reputation
 
-🧠 Architecture Overview
-Microsoft 365
-      ↓
-Wazuh / OpenSearch (SIEM)
-      ↓
-Python Analysis Script
-      ↓
-Threat Intelligence (AbuseIPDB / VirusTotal)
-      ↓
-User Validation (Active Directory / Entra ID)
-      ↓
-Automated Email Alert
+VirusTotal analysis
 
-🔍 How It Works
-
-Log Collection
-
-Queries Office 365 events stored in Wazuh/OpenSearch
-
-Filters events by time window and relevant operations (successful and failed logins)
-
-Analysis & Correlation
-
-Identifies external IP addresses
-
-Checks IP reputation using AbuseIPDB and VirusTotal
+GeoIP location
 
 Validates the user against Active Directory via LDAPS
 
-Verifies account status (enabled / disabled)
+Checks whether the account is enabled or disabled
 
-Decision Logic
+Applies basic correlation rules to reduce noise
 
-Applies contextual rules to reduce noise
+Sends a clear and actionable email alert
 
-Flags only actionable security events
+Detection logic (high level)
 
-Automated Response
+An alert is generated when:
 
-Generates enriched alerts
+A Microsoft 365 login occurs from outside Brazil
 
-Sends structured email notifications with investigation details
+The user exists in Active Directory
 
-⚙️ Features
+The account is enabled
 
-Microsoft 365 login monitoring
+The IP reputation is checked (no blind blocking)
 
-GeoIP-based country detection
+A cache mechanism prevents duplicate alerts for the same event.
 
-IP reputation scoring (AbuseIPDB)
+Why this approach
 
-VirusTotal IP analysis
+Less noise, more context
+
+No dependency on expensive SOAR tools
+
+Easy to adapt to different environments
+
+Focused on decision support, not just alerting
+
+Features
+
+Microsoft 365 login monitoring (success and failure)
+
+GeoIP-based country validation
+
+IP reputation lookup (AbuseIPDB)
+
+VirusTotal IP enrichment
 
 Active Directory lookup via LDAPS
 
 Account status evaluation (userAccountControl)
 
-Cache system to prevent duplicate alerts
+Alert deduplication using cache
 
 HTML and plain-text email notifications
 
-Fully automated execution (cron / Wazuh Active Response)
+Designed for automation (cron or Wazuh Active Response)
+Disclaimer
 
-🛠️ Requirements
+This project is intended for defensive and educational purposes only.
+Do not deploy in production environments without proper authorization and validation.
 
-Python 3.9+
-
-Wazuh SIEM
-
-OpenSearch
-
-Microsoft 365 integration enabled in Wazuh
-
-Active Directory with LDAPS enabled
-
-API keys for:
-
-AbuseIPDB
-
-VirusTotal
-
-Azure Communication Services (Email)
-
-🔐 Environment Variables
-
-Create a .env file with the following variables:
-
-OPENSEARCH_URL=
-OPENSEARCH_USER=
-OPENSEARCH_PASS=
-
-ABUSEIPDB_KEY=
-VIRUSTOTAL_API_KEY=
-
-AZURE_CONNECTION_STRING=
-AZURE_EMAIL_FROM=
-AZURE_EMAIL_TO=
-
-AD_BASE_DN=
-AD_BIND_USER=
-AD_BIND_PASS=
-AD_LDAPS_HOSTS=
-AD_LDAPS_PORT=636
-AD_CA_FILE=
-
-📁 Project Structure
-.
-├── monitor_o365.py
-├── GeoLite2-Country.mmdb
-├── .env
-├── README.md
-
-🚀 Usage
-
-Run manually:
-
-python3 monitor_o365.py
-
-
-Or schedule execution via:
-
-Cron
-
-Wazuh Active Response
-
-SOAR pipeline
-
-⚠️ Disclaimer
-
-This project is intended for educational and defensive security purposes only.
-Do not use this code for unauthorized monitoring or without proper approval.
-
-👨‍💻 Author
+Author
 
 Lhuan Bueno
-Information Security | Blue Team | Automation & SIEM
-GitHub: @lhuanbueno
+Linkedin: lhuanbueno
+
